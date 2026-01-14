@@ -16,7 +16,7 @@ MATERIALS = {
 TOTAL_BUTTONS = len(MATERIALS)
 
 
-def calculate_y(surface: pygame.Surface, i: int):
+def _calculate_y(surface: pygame.Surface, i: int):
     """The math used to calculate how to evenly space y
     position based on height of the surface provided
     """
@@ -32,7 +32,7 @@ def generate_coords(surface: pygame.Surface, x_offset: int = 200):
     """
 
     x = surface.width - x_offset
-    return [(x, calculate_y(surface, i)) for i in range(TOTAL_BUTTONS)]
+    return [(x, _calculate_y(surface, i)) for i in range(TOTAL_BUTTONS)]
 
 
 class Button(pygame.sprite.Sprite):
@@ -104,7 +104,44 @@ class ShopButton(pygame.sprite.Sprite):
         self.screen.blit(self.image, self.image.get_rect(center=self.rect.center))
 
 
-def match_buttons(shop_button: pygame.sprite.Sprite, buttons: pygame.sprite.Group):
+class Inventory(pygame.sprite.Sprite):
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        color: str,
+    ):
+        super().__init__()
+        self.screen = screen
+        self.image = pygame.Surface((500, 100))
+        self.rect = self.image.get_rect(topleft=(350, 0))
+        self.image.fill(color)
+        self.stock = {material: 0 for material in MATERIALS}
+
+    def update(self):
+        bronze = FONT.render(f"Bronze: {self.stock['Bronze']}", True, "black")
+        iron = FONT.render(f"Iron: {self.stock['Iron']}", True, "black")
+        silver = FONT.render(f"Silver: {self.stock['Silver']}", True, "black")
+        gold = FONT.render(f"Gold: {self.stock['Gold']}", True, "black")
+        mithril = FONT.render(f"Mithril: {self.stock['Mithril']}", True, "black")
+        dragonite = FONT.render(f"Dragonite: {self.stock['Dragonite']}", True, "black")
+
+        bronze_rect = bronze.get_rect(topleft=self.rect.topleft)
+        iron_rect = iron.get_rect(topleft=bronze_rect.bottomleft)
+        silver_rect = silver.get_rect(topleft=iron_rect.bottomleft)
+        gold_rect = gold.get_rect(topleft=silver_rect.bottomleft)
+        mithril_rect = mithril.get_rect(topleft=(bronze_rect.topright[0] + 20, 0))
+        dragonite_rect = dragonite.get_rect(topleft=mithril_rect.bottomleft)
+
+        pygame.draw.rect(self.screen, "purple", self.rect, border_radius=10)
+        self.screen.blit(bronze, bronze_rect)
+        self.screen.blit(iron, iron_rect)
+        self.screen.blit(silver, silver_rect)
+        self.screen.blit(gold, gold_rect)
+        self.screen.blit(mithril, mithril_rect)
+        self.screen.blit(dragonite, dragonite_rect)
+
+
+def match_buttons(shop_button: ShopButton, buttons: pygame.sprite.Group):
     button = next(filter(lambda b: b.material in shop_button.text.split(), buttons))
     button.toggle_button()
     shop_button.kill()

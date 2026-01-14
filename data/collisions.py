@@ -5,14 +5,13 @@ from .ui import Button, FONT
 class FloatScore(pygame.sprite.Sprite):
     """Floaty bois when you clicky da buttons"""
 
-    def __init__(self, text: str, pos: tuple[int, int], lift_speed: int = 4) -> None:
+    def __init__(self, text: str, pos: tuple[int, int]) -> None:
         pygame.sprite.Sprite.__init__(self)
-        self.lift_speed = lift_speed
         self.image = FONT.render(text, True, "white")
         self.rect = self.image.get_rect(center=pos)
 
     def update(self):
-        self.rect.y -= self.lift_speed
+        self.rect.y -= 4
         self.image.set_alpha(self.image.get_alpha() - 7)
         if self.image.get_alpha() <= 0:
             self.kill()

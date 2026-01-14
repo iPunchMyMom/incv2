@@ -1,6 +1,7 @@
 import pygame
 from data.ui import (
     Button,
+    Inventory,
     ShopButton,
     MATERIALS,
     BUTTON_SIZE,
@@ -55,6 +56,7 @@ class Game:
 
         self.mining_power = 1
         self.scores = pygame.sprite.Group()
+        self.inventory = Inventory(self.screen, "red")
 
     def run(self):
         while True:
@@ -62,6 +64,7 @@ class Game:
             self.clock.tick(60)
             self.buttons.update()
             self.shop_buttons.update()
+            self.inventory.update()
             self.scores.update()
             self.scores.draw(self.screen)
             for event in pygame.event.get():
@@ -72,6 +75,7 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     for collision in check_click_collision(self.buttons, event):
                         self.scores.add(FloatScore(f"+{self.mining_power}", event.pos))
+                        self.inventory.stock[collision.material] += 1
                     for collision in check_click_collision(self.shop_buttons, event):
                         match_buttons(collision, self.buttons)
 
