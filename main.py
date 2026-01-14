@@ -41,14 +41,18 @@ class Game:
                 button.toggle_button()
             self.buttons.add(button)
 
-        self.shop_button = ShopButton(
-            self.screen,
-            "Unock Iron",
-            "red",
-            (0, 0),
-            (200, 50),
-        )
-        self.shop_buttons = pygame.sprite.GroupSingle(self.shop_button)
+        self.shop_buttons = pygame.sprite.Group()
+        for y, material in zip(range(6), MATERIALS):
+            if material != "Bronze":
+                shop = ShopButton(
+                    self.screen,
+                    f"Unlock {material}",
+                    MATERIALS[material],
+                    (0, y * 50 - 50),
+                    (200, 50),
+                )
+                self.shop_buttons.add(shop)
+
         self.mining_power = 1
         self.scores = pygame.sprite.Group()
 
