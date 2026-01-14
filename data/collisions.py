@@ -24,6 +24,8 @@ class ButtonCollider(pygame.sprite.Sprite):
 
 
 def check_click_collision(buttons: pygame.sprite.Group, event: pygame.Event):
+    """Should only return a single button as a match for collision.
+    Access the lone item with [0] or next()"""
     click_pos = ButtonCollider(event.pos)
     collisions: list[Button] = pygame.sprite.spritecollide(
         click_pos,

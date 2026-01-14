@@ -13,11 +13,12 @@ class ShopButton(pygame.sprite.Sprite):
     ):
         super().__init__()
         self.screen = screen
+        self.text = text
         self.size = size
         self.color = color
         self.pos = pos
         self.rect = pygame.Rect(self.pos, self.size)
-        self.image = FONT.render(text, True, "black")
+        self.image = FONT.render(self.text, True, "black")
 
     def update(self):
         pygame.draw.rect(self.screen, "red", self.rect, border_radius=10)

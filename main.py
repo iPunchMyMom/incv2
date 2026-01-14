@@ -63,10 +63,12 @@ class Game:
                     collisions = check_click_collision(self.buttons, event)
                     if collisions and collisions[0].enabled:
                         self.scores.add(FloatScore(f"+{self.mining_power}", event.pos))
-                    if check_click_collision(self.shop_buttons, event):
+                    collisions = check_click_collision(self.shop_buttons, event)
+                    if collisions:
                         for button in self.buttons.sprites():
-                            if button.material == "Iron":
+                            if button.material in collisions[0].text.split():
                                 button.toggle_button()
+                                collisions[0].kill()
 
             pygame.display.flip()
 
