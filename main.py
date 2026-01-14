@@ -1,6 +1,12 @@
-from data.shops import ShopButton
 import pygame
-from data.ui import Button, MATERIALS, BUTTON_SIZE, generate_coords
+from data.ui import (
+    Button,
+    ShopButton,
+    MATERIALS,
+    BUTTON_SIZE,
+    generate_coords,
+    match_buttons,
+)
 from data.collisions import FloatScore, check_click_collision
 
 
@@ -60,15 +66,10 @@ class Game:
                     exit()
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    collisions = check_click_collision(self.buttons, event)
-                    if collisions and collisions[0].enabled:
+                    for collision in check_click_collision(self.buttons, event):
                         self.scores.add(FloatScore(f"+{self.mining_power}", event.pos))
-                    collisions = check_click_collision(self.shop_buttons, event)
-                    if collisions:
-                        for button in self.buttons.sprites():
-                            if button.material in collisions[0].text.split():
-                                button.toggle_button()
-                                collisions[0].kill()
+                    for collision in check_click_collision(self.shop_buttons, event):
+                        match_buttons(collision, self.buttons)
 
             pygame.display.flip()
 

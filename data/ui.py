@@ -79,3 +79,32 @@ class Button(pygame.sprite.Sprite):
         text_rect = text_surface.get_rect(center=self.rect.center)
         self.screen.blit(self.trans_surf, self.pos)
         self.screen.blit(text_surface, text_rect)
+
+
+class ShopButton(pygame.sprite.Sprite):
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        text: str,
+        color: str,
+        pos: tuple[int, int],
+        size: tuple[int, int],
+    ):
+        super().__init__()
+        self.screen = screen
+        self.text = text
+        self.size = size
+        self.color = color
+        self.pos = pos
+        self.rect = pygame.Rect(self.pos, self.size)
+        self.image = FONT.render(self.text, True, "black")
+
+    def update(self):
+        pygame.draw.rect(self.screen, "red", self.rect, border_radius=10)
+        self.screen.blit(self.image, self.image.get_rect(center=self.rect.center))
+
+
+def match_buttons(shop_button: pygame.sprite.Sprite, buttons: pygame.sprite.Group):
+    button = next(filter(lambda b: b.material in shop_button.text.split(), buttons))
+    button.toggle_button()
+    shop_button.kill()

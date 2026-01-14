@@ -3,19 +3,26 @@ from .ui import Button, FONT
 
 
 class FloatScore(pygame.sprite.Sprite):
-    def __init__(self, text: str, pos: tuple[int, int]) -> None:
+    """Floaty bois when you clicky da buttons"""
+
+    def __init__(self, text: str, pos: tuple[int, int], lift_speed: int = 4) -> None:
         pygame.sprite.Sprite.__init__(self)
+        self.lift_speed = lift_speed
         self.image = FONT.render(text, True, "white")
         self.rect = self.image.get_rect(center=pos)
 
     def update(self):
-        self.rect.y -= 4
+        self.rect.y -= self.lift_speed
         self.image.set_alpha(self.image.get_alpha() - 7)
         if self.image.get_alpha() <= 0:
             self.kill()
 
 
 class ButtonCollider(pygame.sprite.Sprite):
+    """Helper class that is intended to be temporarily created
+    at the position the mouse was clicked. The collision area
+    is a 1x1 rect to the as precise a collision detection as possible"""
+
     def __init__(self, pos: tuple[int, int]) -> None:
         super().__init__()
         self.pos = pos
