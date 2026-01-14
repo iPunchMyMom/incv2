@@ -1,3 +1,4 @@
+from data.shops import ShopButton
 import pygame
 from data.ui import Button, MATERIALS, BUTTON_SIZE, generate_coords
 from data.collisions import FloatScore, check_click_collision
@@ -5,7 +6,6 @@ from data.collisions import FloatScore, check_click_collision
 
 WIDTH = 1200
 HEIGHT = 800
-BG_COLOR = "#505050"
 GAME_TITLE = "Incremental"
 BASE_BG_PATH = "./data/sprites/parallax_forest_pack web/v2/"
 
@@ -35,6 +35,14 @@ class Game:
                 button.toggle_button()
             self.buttons.add(button)
 
+        self.shop_button = ShopButton(
+            self.screen,
+            "Unock Iron",
+            "red",
+            (0, 0),
+            (200, 50),
+        )
+        self.shop_buttons = pygame.sprite.GroupSingle(self.shop_button)
         self.mining_power = 1
         self.scores = pygame.sprite.Group()
 
@@ -43,6 +51,7 @@ class Game:
             self.screen.blit(self.scaled_bg, (0, 0))
             self.clock.tick(60)
             self.buttons.update()
+            self.shop_buttons.update()
             self.scores.update()
             self.scores.draw(self.screen)
             for event in pygame.event.get():
@@ -54,6 +63,10 @@ class Game:
                     collisions = check_click_collision(self.buttons, event)
                     if collisions and collisions[0].enabled:
                         self.scores.add(FloatScore(f"+{self.mining_power}", event.pos))
+                    if check_click_collision(self.shop_buttons, event):
+                        for button in self.buttons.sprites():
+                            if button.material == "Iron":
+                                button.toggle_button()
 
             pygame.display.flip()
 
