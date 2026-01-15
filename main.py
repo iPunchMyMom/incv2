@@ -1,4 +1,5 @@
 import pygame
+
 from data.ui import (
     Button,
     Inventory,
@@ -19,6 +20,9 @@ BASE_BG_PATH = "./data/sprites/parallax_forest_pack web/v2/"
 
 class Game:
     def __init__(self):
+        # pygame.mixer.init(buffer=44100, channels=16)
+        pygame.mixer.init()
+        self.click_sound = pygame.mixer.Sound("./data/sounds/Wav/Cursor_tones/cursor_style_5.wav")
         pygame.init()
         pygame.font.init()
 
@@ -52,11 +56,12 @@ class Game:
                     (0, y * 50 - 50),
                     (200, 50),
                 )
+                shop._set_price(material)
                 self.shop_buttons.add(shop)
 
         self.mining_power = 1
         self.scores = pygame.sprite.Group()
-        self.inventory = Inventory(self.screen, "red")
+        self.inventory = Inventory(self.screen, "purple")
 
     def run(self):
         while True:
@@ -74,10 +79,12 @@ class Game:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     for collision in check_click_collision(self.buttons, event):
-                        self.scores.add(FloatScore(f"+{self.mining_power}", event.pos))
-                        self.inventory.stock[collision.material] += 1
+                        if collision.enabled:
+                            self.scores.add(FloatScore(f"+{self.mining_power}", event.pos))
+                            self.click_sound.play(maxtime=80)  # changing default maxtime stops mix channels from clogging
+                            self.inventory.stock[collision.material] += 1
                     for collision in check_click_collision(self.shop_buttons, event):
-                        match_buttons(collision, self.buttons)
+                        match_buttons(collision, self.buttons, self.inventory)
 
             pygame.display.flip()
 

@@ -98,6 +98,20 @@ class ShopButton(pygame.sprite.Sprite):
         self.pos = pos
         self.rect = pygame.Rect(self.pos, self.size)
         self.image = FONT.render(self.text, True, "black")
+        self.price = None
+
+    def _set_price(self, material: str):
+        match material:
+            case "Iron":
+                self.price = ("Bronze", 25)
+            case "Silver":
+                self.price = ("Iron", 25)
+            case "Gold":
+                self.price = ("Silver", 25)
+            case "Mithril":
+                self.price = ("Gold", 25)
+            case "Dragonite":
+                self.price = ("Mithril", 25)
 
     def update(self):
         pygame.draw.rect(self.screen, "red", self.rect, border_radius=10)
@@ -112,27 +126,32 @@ class Inventory(pygame.sprite.Sprite):
     ):
         super().__init__()
         self.screen = screen
-        self.image = pygame.Surface((500, 100))
-        self.rect = self.image.get_rect(topleft=(350, 0))
-        self.image.fill(color)
+        self.color = color
+        self.image = pygame.Surface((300, 200), pygame.SRCALPHA)
+        self.rect = self.image.get_rect(topleft=(350, 10))
         self.stock = {material: 0 for material in MATERIALS}
 
     def update(self):
         bronze = FONT.render(f"Bronze: {self.stock['Bronze']}", True, "black")
-        iron = FONT.render(f"Iron: {self.stock['Iron']}", True, "black")
-        silver = FONT.render(f"Silver: {self.stock['Silver']}", True, "black")
-        gold = FONT.render(f"Gold: {self.stock['Gold']}", True, "black")
-        mithril = FONT.render(f"Mithril: {self.stock['Mithril']}", True, "black")
-        dragonite = FONT.render(f"Dragonite: {self.stock['Dragonite']}", True, "black")
+        iron = FONT.render(f"Iron: {self.stock['Iron']}         25 Bronze", True, "black")
+        silver = FONT.render(f"Silver: {self.stock['Silver']}         25 Iron", True, "black")
+        gold = FONT.render(f"Gold: {self.stock['Gold']}         25 Silver", True, "black")
+        mithril = FONT.render(f"Mithril: {self.stock['Mithril']}        25 Gold", True, "black")
+        dragonite = FONT.render(f"Dragonite: {self.stock['Dragonite']}   25 Mithril", True, "black")
 
         bronze_rect = bronze.get_rect(topleft=self.rect.topleft)
         iron_rect = iron.get_rect(topleft=bronze_rect.bottomleft)
+        iron_rect.y += 5
         silver_rect = silver.get_rect(topleft=iron_rect.bottomleft)
+        silver_rect.y += 5
         gold_rect = gold.get_rect(topleft=silver_rect.bottomleft)
-        mithril_rect = mithril.get_rect(topleft=(bronze_rect.topright[0] + 20, 0))
+        gold_rect.y += 5
+        mithril_rect = mithril.get_rect(topleft=gold_rect.bottomleft)
+        mithril_rect.y += 5
         dragonite_rect = dragonite.get_rect(topleft=mithril_rect.bottomleft)
+        dragonite_rect.y += 5
 
-        pygame.draw.rect(self.screen, "purple", self.rect, border_radius=10)
+        pygame.draw.rect(self.screen, self.color, self.rect, border_radius=10)
         self.screen.blit(bronze, bronze_rect)
         self.screen.blit(iron, iron_rect)
         self.screen.blit(silver, silver_rect)
@@ -141,7 +160,13 @@ class Inventory(pygame.sprite.Sprite):
         self.screen.blit(dragonite, dragonite_rect)
 
 
-def match_buttons(shop_button: ShopButton, buttons: pygame.sprite.Group):
-    button = next(filter(lambda b: b.material in shop_button.text.split(), buttons))
-    button.toggle_button()
-    shop_button.kill()
+def match_buttons(shop_button: ShopButton, buttons: pygame.sprite.Group, inventory: Inventory):
+    button = filter(
+        lambda b: b.material in shop_button.text.split() and inventory.stock[shop_button.price[0]] >= shop_button.price[1],
+        buttons,
+    )
+    button = next(button, None)
+    if button:
+        button.toggle_button()
+        inventory.stock[shop_button.price[0]] -= shop_button.price[1]
+        shop_button.kill()
